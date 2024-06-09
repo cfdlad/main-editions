@@ -10,10 +10,10 @@ jobs:
     strategy:
       matrix:
         ##### EDIT ME #####
-        EDITION: [gnome, xfce, kde]
+        EDITION: [gnome]        #options include [gnome, xfce, kde]
         KERNEL: [linux69]
         BRANCH: [stable]
-        SCOPE: [minimal,full]
+        SCOPE: [minimal,full]  #options include [minimal,full]
         ###################
     steps:
       - uses: styfle/cancel-workflow-action@0.10.1
@@ -25,9 +25,14 @@ jobs:
           edition: ${{ matrix.edition }}
           branch: ${{ matrix.branch }}
           scope: ${{ matrix.scope }}
+
+          #Added this code below to let the build process point to my branched iso-profiles repo and not the official manjaro one
+          iso-profiles-repo: "https://github.com/cfdlad/iso-profiles"
+          iso-profiles-branch: "june_2024_iso-profiles"
+          
           version: "24.0.1"
           kernel: ${{ matrix.kernel }}
-          code-name: "Wynsdey"
+          code-name: "Baba_Wynsdey"
           office-chooser: "true"
           gpg-secret-key-base64: ${{ secrets.CI_PRIV_KEY }}
           gpg-passphrase: ${{ secrets.CI_GPG_PASSPHRASE }}
