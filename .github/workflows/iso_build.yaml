@@ -40,6 +40,11 @@ jobs:
           edition: ${{ matrix.edition }}
           branch: ${{ matrix.branch }}
           scope: ${{ matrix.scope }}
+          
+          #Added this code below to let the build process point to my branched iso-profiles repo and not the official manjaro one
+          iso-profiles-repo: "https://github.com/cfdlad/iso-profiles"
+          iso-profiles-branch: "june_2024_iso-profiles"
+          
           version: "24.0.1"
           kernel: ${{ matrix.kernel }}
           code-name: "Baba_Wynsdey"
