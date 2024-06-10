@@ -5,7 +5,7 @@ on:
     - cron:  '30 6 1 * *'
 
 jobs:
-  release:
+  prepare-release:
     runs-on: ubuntu-20.04
         steps:
       - 
@@ -21,7 +21,7 @@ jobs:
       release_tag: ${{ steps.time.outputs.time }}
   build-release:
     runs-on: ubuntu-20.04
-    needs: [release]
+    needs: [prepare-release]
     strategy:
       matrix:
         ##### EDIT ME #####
@@ -48,13 +48,13 @@ jobs:
           version: "24.0.1"
           kernel: ${{ matrix.kernel }}
           code-name: "Baba_Wynsdey"
-          release-tag: ${{ needs.release.outputs.release_tag }}
+          release-tag: ${{ needs.prepare-release.outputs.release_tag }}
       - name: rollback
         if: ${{ failure() || cancelled() }}
         run: |
           echo ${{ github.token }} | gh auth login --with-token
           gh release delete ${{ needs.release.outputs.release_tag }} -y --repo ${{ github.repository }}
-          git push --delete origin ${{ needs.release.outputs.release_tag }}
+          git push --delete origin ${{ needs.prepare-release.outputs.release_tag }}
 
          
 #          office-chooser: "true"
