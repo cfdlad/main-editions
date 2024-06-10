@@ -18,7 +18,6 @@ jobs:
         with:
           format: 'YYYYMMDDHHmm'
     outputs:
-      release_tag: ${{ steps.time.outputs.time }}    outputs:
       release_tag: ${{ steps.time.outputs.time }}
   build-release:
     runs-on: ubuntu-20.04
