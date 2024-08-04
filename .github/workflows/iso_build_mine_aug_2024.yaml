@@ -1,8 +1,8 @@
 name: iso_build_mine
 on:
-  workflow_dispatch:
-  #schedule:
-    #- cron:  '30 6 1 * *'
+#  workflow_dispatch:
+#  schedule:
+    - cron:  '30 6 1 * *'
 
 jobs:
   prepare-release:
@@ -43,9 +43,9 @@ jobs:
           
           #Added this code below to let the build process point to my branched iso-profiles repo and not the official manjaro one
           iso-profiles-repo: "https://github.com/cfdlad/iso-profiles"
-          iso-profiles-branch: "june_2024_iso-profiles"
+          iso-profiles-branch: "aug_2024_iso-profiles"
           
-          version: "24.0.1"
+          version: "24.0.5"
           kernel: ${{ matrix.kernel }}
           code-name: "Baba_Wynsdey"
           release-tag: ${{ needs.prepare-release.outputs.release_tag }}
