@@ -1,0 +1,77 @@
+name: iso_build_mine
+on:
+  workflow_dispatch:
+#  schedule:
+#    - cron:  '30 6 1 * *'
+
+jobs:
+  prepare-release:
+    runs-on: ubuntu-20.04
+    steps:
+      - 
+        uses: styfle/cancel-workflow-action@0.10.1
+        with:
+          access_token: ${{ github.token }}
+      - 
+        id: time
+        uses: nanzm/get-time-action@v1.1
+        with:
+          format: 'YYYYMMDDHHmm'
+    outputs:
+      release_tag: ${{ steps.time.outputs.time }}
+  build-release:
+    runs-on: ubuntu-20.04
+    needs: [prepare-release]
+    strategy:
+      matrix:
+        ##### EDIT ME #####
+        EDITION: [gnome]
+        KERNEL: [linux69]
+        BRANCH: [stable]
+        SCOPE: [full]
+        ###################
+    steps:
+      - uses: styfle/cancel-workflow-action@0.10.1
+        with:
+          access_token: ${{ github.token }}
+      - id: image-build
+        uses: manjaro/manjaro-iso-action@main
+        with:
+          edition: ${{ matrix.edition }}
+          branch: ${{ matrix.branch }}
+          scope: ${{ matrix.scope }}
+          
+          #Added this code below to let the build process point to my branched iso-profiles repo and not the official manjaro one
+          iso-profiles-repo: "https://github.com/cfdlad/iso-profiles"
+          iso-profiles-branch: "aug_2024_iso-profile_testing_wine"
+          
+          version: "24.0.5"
+          kernel: ${{ matrix.kernel }}
+          code-name: "Baba_Wynsdey"
+          release-tag: ${{ needs.prepare-release.outputs.release_tag }}
+      - name: rollback
+        if: ${{ failure() || cancelled() }}
+        run: |
+          echo ${{ github.token }} | gh auth login --with-token
+          gh release delete ${{ needs.prepare-release.outputs.release_tag }} -y --repo ${{ github.repository }}
+          git push --delete origin ${{ needs.prepare-release.outputs.release_tag }}
+
+         
+#          office-chooser: "true"
+#          gpg-secret-key-base64: ${{ secrets.CI_PRIV_KEY }}
+#          gpg-passphrase: ${{ secrets.CI_GPG_PASSPHRASE }}
+#          sf-project: manjarolinux
+#          sf-user: ${{ secrets.SF_USER_NAME }}
+#          sf-key: ${{ secrets.SF_PRIV_SSHKEY }}
+#          s3-cfg: ${{ secrets.S3_CFG }}
+#      - name: rollback sourceforge upload
+#        if: ${{ failure() || cancelled() }}
+#        env:
+#          SSH_AUTH_SOCK: /tmp/ssh_agent.sock
+#        run: |
+#          rsync --delete -vaP --stats \
+#              -e ssh $(mktemp) ${{ secrets.SF_USER_NAME }}@frs.sourceforge.net:/home/frs/project/${{ env.sf-project }}/${{ env.edition }}/${{ env.version }}
+#      - name: rollback cdn77 upload
+#        if: ${{ failure() || cancelled() }}
+#        run: |
+#          s3cmd rm -r -f s3://s3downloadseu/${{ env.edition }}/${{ env.version }}
