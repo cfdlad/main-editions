@@ -45,7 +45,7 @@ jobs:
           iso-profiles-repo: "https://github.com/cfdlad/iso-profiles"
           iso-profiles-branch: "aug_2024_iso-profile_testing_wine"
           
-          version: "24.0.5"
+          version: "24.0.6"
           kernel: ${{ matrix.kernel }}
           code-name: "Baba_Wynsdey"
           release-tag: ${{ needs.prepare-release.outputs.release_tag }}
