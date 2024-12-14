@@ -40,8 +40,8 @@ jobs:
           scope: ${{ matrix.scope }}
           
           #Added this code below to let the build process point to my branched iso-profiles repo and not the official manjaro one
-          iso-profiles-repo: "https://github.com/cfdlad/iso-profiles"
-          iso-profiles-branch: "dec_2024_iso-profiles"
+          iso-profiles-repo: 'https://github.com/cfdlad/iso-profiles'
+          iso-profiles-branch: 'dec_2024_iso-profiles'
           
           version: "24.2.0"
           kernel: ${{ matrix.kernel }}
