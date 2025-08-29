@@ -66,9 +66,9 @@ jobs:
           iso-profiles-repo: 'https://github.com/cfdlad/iso-profiles'
           iso-profiles-branch: 'dec_2024_iso-profiles'
           
-          version: "24.2.1"
+          version: "25.0.7"
           kernel: ${{ matrix.kernel }}
-          code-name: "Baba_Yonada"
+          code-name: "Baba_Zetar"
           release-tag: ${{ needs.prepare-release.outputs.release_tag }}
       - name: rollback
         if: ${{ failure() || cancelled() }}
