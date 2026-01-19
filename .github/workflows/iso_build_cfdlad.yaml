@@ -1,4 +1,4 @@
-name: iso_build_mine_dec
+name: iso_build_cfdlad
 on:
   workflow_dispatch:
   #schedule:
