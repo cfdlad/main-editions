@@ -1,0 +1,78 @@
+name: iso_build_mine_dec
+on:
+  workflow_dispatch:
+  #schedule:
+    #- cron:  '0 2 1 * *'
+
+jobs:
+# ...
+
+  free-disk-space:
+    runs-on: ubuntu-24.04
+    steps:
+
+    - name: Free GitHub Actions Disk Space (Ubuntu)
+      uses: coder-xiaomo/free-disk-space@main
+      with:
+        # this might remove tools that are actually needed if set to "true"
+        tool-cache: true
+
+        # all of these default to true and will be cleared, so set to "false"
+        # if necessary for your workflow
+        android: true
+        dotnet: true
+        haskell: true
+        large-packages: true
+        docker-images: true
+        swap-storage: true
+
+# ...
+  prepare-release:
+    runs-on: ubuntu-24.04
+    needs: free-disk-space
+    steps:
+      - uses: styfle/cancel-workflow-action@01ce38bf961b4e243a6342cbade0dbc8ba3f0432 # 0.12.0
+        with:
+          access_token: ${{ github.token }}
+      - id: time
+        uses: nanzm/get-time-action@887e4db9af58ebae64998b7105921b816af77977 # v2.0
+        with:
+          format: 'YYYYMMDDHHmm'
+    outputs:
+      release_tag: ${{ steps.time.outputs.time }}      
+  release:
+    runs-on: ubuntu-24.04
+    needs: prepare-release    
+    strategy:
+      matrix:
+        ##### EDIT ME #####
+        KERNEL: [linux618]
+        EDITION: [gnome]
+        BRANCH: [stable]
+        SCOPE: [full]
+        ###################
+    steps:
+      - uses: styfle/cancel-workflow-action@01ce38bf961b4e243a6342cbade0dbc8ba3f0432 # 0.12.0
+        with:
+          access_token: ${{ github.token }}
+      - id: image-build
+        uses: cfdlad/manjaro-iso-action@main
+        with:
+          edition: ${{ matrix.edition }}
+          branch: ${{ matrix.branch }}
+          scope: ${{ matrix.scope }}
+          
+          #Added this code below to let the build process point to my branched iso-profiles repo and not the official manjaro one
+          iso-profiles-repo: 'https://github.com/cfdlad/iso-profiles'
+          iso-profiles-branch: 'cfdlad_iso-profiles'
+          
+          version: "26.0.1"
+          kernel: ${{ matrix.kernel }}
+          code-name: "cfdlad_Anh-Linh"
+          release-tag: ${{ needs.prepare-release.outputs.release_tag }}
+      - name: rollback
+        if: ${{ failure() || cancelled() }}
+        run: |
+          echo ${{ github.token }} | gh auth login --with-token
+          gh release delete ${{ needs.prepare-release.outputs.release_tag }} -y --repo ${{ github.repository }}
+          git push --delete origin ${{ needs.prepare-release.outputs.release_tag }}
